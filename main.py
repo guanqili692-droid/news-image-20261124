@@ -17,8 +17,14 @@ OUT = OUT_DIR / "entry.png"
 
 
 def main() -> None:
+    if not SRC.is_file():
+        raise SystemExit(f"entry image missing: {SRC}")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(SRC, OUT)
+    # Verify the copy is byte-identical, so a truncated write is never
+    # mistaken for a valid deterministic run.
+    if OUT.stat().st_size != SRC.stat().st_size:
+        raise SystemExit("entry image copy is incomplete")
 
 
 if __name__ == "__main__":
